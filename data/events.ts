@@ -1,0 +1,58 @@
+import { TimelineEvent } from '@/types/events'
+
+export const TIMELINE_EVENTS: TimelineEvent[] = [
+  {
+    date: '2017-05-14',
+    title: '\u00c9lection Emmanuel Macron',
+    description: '\u00c9lection du pr\u00e9sident avec 66,1% des voix au second tour face \u00e0 Marine Le Pen.',
+    category: 'reforme',
+    indicatorNames: ['pib', 'chomage'],
+    sources: ['https://www.conseil-constitutionnel.fr/'],
+    displayOrder: 1,
+  },
+  {
+    date: '2017-12-30',
+    title: 'Suppression ISF \u2192 IFI',
+    description: "Remplacement de l'Imp\u00f4t de Solidarit\u00e9 sur la Fortune par l'Imp\u00f4t sur la Fortune Immobili\u00e8re. Flat tax de 30% sur les revenus du capital.",
+    category: 'fiscalite',
+    indicatorNames: ['pib'],
+    sources: ['https://www.legifrance.gouv.fr/'],
+    displayOrder: 2,
+  },
+  {
+    date: '2018-11-17',
+    title: 'Mouvement des Gilets jaunes',
+    description: "Mouvement social d\u00e9clench\u00e9 par la hausse de la taxe carbone sur les carburants. Concessions gouvernementales : prime d'activit\u00e9, annulation taxe carbone.",
+    category: 'social',
+    indicatorNames: ['inflation_ipc', 'pib'],
+    sources: [],
+    displayOrder: 3,
+  },
+  {
+    date: '2020-03-17',
+    title: 'Premier confinement COVID-19',
+    description: "Confinement national strict. PIB chute de -7,9% sur l'ann\u00e9e. Mise en place du \"quoi qu'il en co\u00fbte\".",
+    category: 'crise',
+    indicatorNames: ['pib', 'chomage', 'inflation_ipc'],
+    sources: [],
+    displayOrder: 4,
+  },
+  {
+    date: '2021-09-03',
+    title: 'Plan France Relance',
+    description: "Plan de relance de 100 Md\u20ac : transition \u00e9cologique, comp\u00e9titivit\u00e9, coh\u00e9sion. Prolong\u00e9 par France 2030 (34 Md\u20ac).",
+    category: 'reforme',
+    indicatorNames: ['pib', 'chomage'],
+    sources: ['https://www.economie.gouv.fr/plan-de-relance'],
+    displayOrder: 5,
+  },
+  {
+    date: '2023-04-14',
+    title: 'R\u00e9forme des retraites (49.3)',
+    description: "Recul de l'\u00e2ge l\u00e9gal de d\u00e9part de 62 \u00e0 64 ans. Adoption par 49.3. Mouvement social massif.",
+    category: 'reforme',
+    indicatorNames: ['chomage'],
+    sources: ['https://www.legifrance.gouv.fr/'],
+    displayOrder: 6,
+  },
+]
