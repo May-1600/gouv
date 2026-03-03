@@ -72,7 +72,7 @@ export function DataPanel({ indicator, eventDate, position }: DataPanelProps) {
                   backdropFilter: 'blur(8px)',
                   fontSize: '12px',
                 }}
-                formatter={(value: number) => [`${value} ${indicator.unit}`, indicator.label]}
+                formatter={(value: number | undefined) => [`${value ?? ''} ${indicator.unit}`, indicator.label]}
                 labelFormatter={(label) => `Date: ${label}`}
               />
               <ReferenceLine
