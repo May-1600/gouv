@@ -5,6 +5,18 @@ import { Canvas } from '@react-three/fiber'
 import { CanvasErrorBoundary } from './CanvasErrorBoundary'
 import { LoadingScreen } from './LoadingScreen'
 import { Timeline } from '@/components/three/world/Timeline'
+import { EventRoom } from '@/components/three/rooms/EventRoom'
+import { useAppStore } from '@/lib/store'
+
+function Scene() {
+  const navigation = useAppStore((s) => s.navigation)
+
+  if (navigation === 'room') {
+    return <EventRoom />
+  }
+
+  return <Timeline />
+}
 
 export function MainCanvas() {
   return (
@@ -17,7 +29,7 @@ export function MainCanvas() {
             dpr={[1, 2]}
             gl={{ antialias: true }}
           >
-            <Timeline />
+            <Scene />
           </Canvas>
         </Suspense>
       </div>
