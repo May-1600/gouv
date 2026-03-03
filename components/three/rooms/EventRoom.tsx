@@ -1,5 +1,6 @@
 'use client'
 
+import * as THREE from 'three'
 import { OrbitControls } from '@react-three/drei'
 import { useAppStore } from '@/lib/store'
 import { useRoomData } from '@/lib/hooks/useRoomData'
@@ -7,6 +8,7 @@ import { getRoomStyle } from '@/lib/three/room-config'
 import { RoomEnvironment, ROOM_WIDTH } from './RoomEnvironment'
 import { DataPanel } from '@/components/three/data-viz/DataPanel'
 import { DataColumnRow } from '@/components/three/data-viz/DataColumn'
+import { NarrativePanel } from '@/components/three/data-viz/NarrativePanel'
 
 export function EventRoom() {
   const activeEventId = useAppStore((s) => s.activeEventId)
@@ -27,6 +29,13 @@ export function EventRoom() {
         maxDistance={15}
         maxPolarAngle={Math.PI / 2}
         enablePan={false}
+        enableDamping
+        dampingFactor={0.08}
+        rotateSpeed={0.5}
+        touches={{
+          ONE: THREE.TOUCH.ROTATE,
+          TWO: THREE.TOUCH.DOLLY_ROTATE,
+        }}
       />
 
       {/* Data visualizations — only when data is loaded */}
@@ -62,6 +71,24 @@ export function EventRoom() {
               />
             )
           })}
+
+          {/* Narrative panels: positioned to the right side of the room */}
+          {data.narratives && data.narratives.length > 0 &&
+            data.narratives.map((narrative, i) => {
+              const indicator = data.indicators.find(
+                (ind) => ind.name === narrative.indicatorName
+              )
+              if (!indicator) return null
+              return (
+                <NarrativePanel
+                  key={narrative.indicatorName}
+                  narrative={narrative}
+                  indicatorLabel={indicator.label}
+                  indicatorColor={indicator.color}
+                  position={[6, 3 - i * 2.5, -2]}
+                />
+              )
+            })}
         </group>
       )}
 

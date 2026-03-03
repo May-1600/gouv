@@ -12,10 +12,10 @@ export function RoomHUD() {
   if (navigation !== 'room') return null
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 p-6">
-      <div className="flex items-start justify-between">
+    <div className="fixed inset-x-0 top-0 z-50 p-4 sm:p-6" role="region" aria-label="Détails de l'événement">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         {/* Event info */}
-        <div className="glass-panel max-w-lg p-6">
+        <div className="glass-panel max-w-lg p-4 sm:p-6">
           {loading ? (
             <p className="text-sm text-gray-500">Chargement…</p>
           ) : data ? (
@@ -24,16 +24,16 @@ export function RoomHUD() {
                 {data.event.date} — {data.event.category}
               </p>
               <h2
-                className="mb-2 text-2xl font-bold"
+                className="mb-2 text-lg font-bold sm:text-2xl"
                 style={{ fontFamily: 'var(--font-title)' }}
               >
                 {data.event.title}
               </h2>
-              <p className="text-sm leading-relaxed text-gray-700">
+              <p className="hidden text-sm leading-relaxed text-gray-700 sm:block">
                 {data.event.description}
               </p>
               {data.event.sources && data.event.sources.length > 0 && (
-                <div className="mt-3 flex gap-2">
+                <div className="mt-3 hidden gap-2 sm:flex">
                   {data.event.sources.map((src, i) => (
                     <a
                       key={i}
@@ -54,10 +54,11 @@ export function RoomHUD() {
         {/* Back button */}
         <button
           onClick={exitRoom}
-          className="glass-panel px-5 py-3 text-sm font-semibold transition-transform hover:scale-105"
+          className="glass-panel px-4 py-2 text-sm font-semibold transition-transform hover:scale-105 sm:px-5 sm:py-3"
           style={{ fontFamily: 'var(--font-title)' }}
+          aria-label="Retour à la timeline"
         >
-          ← Retour à la timeline
+          ← Retour
         </button>
       </div>
     </div>

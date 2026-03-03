@@ -15,7 +15,7 @@ export function TimelineSidebar() {
   const cursorPercent = scrollProgress * 100
 
   return (
-    <div className="fixed right-6 top-1/2 z-50 -translate-y-1/2" style={{ height: '60vh' }}>
+    <div className="fixed right-4 top-1/2 z-50 h-[40vh] -translate-y-1/2 sm:right-6 sm:h-[60vh]">
       <div className="relative h-full w-1 rounded-full bg-white/30">
         {/* Cursor */}
         <div
@@ -23,7 +23,7 @@ export function TimelineSidebar() {
           style={{ top: `${cursorPercent}%` }}
         >
           <div
-            className="glass-panel flex h-8 items-center gap-2 whitespace-nowrap px-3 text-sm font-semibold"
+            className="glass-panel flex h-8 items-center gap-2 whitespace-nowrap px-3 text-xs font-semibold sm:text-sm"
             style={{ fontFamily: 'var(--font-title)' }}
           >
             {currentYear}
