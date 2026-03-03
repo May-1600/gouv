@@ -10,6 +10,7 @@ import { DataColumnRow } from '@/components/three/data-viz/DataColumn'
 
 export function EventRoom() {
   const activeEventId = useAppStore((s) => s.activeEventId)
+  const isTransitioning = useAppStore((s) => s.isTransitioning)
   const { data, loading } = useRoomData(activeEventId)
 
   const category = data?.event.category ?? null
@@ -20,6 +21,7 @@ export function EventRoom() {
       <RoomEnvironment style={style} />
 
       <OrbitControls
+        enabled={!isTransitioning}
         target={[0, 2, -1]}
         minDistance={3}
         maxDistance={15}

@@ -8,9 +8,11 @@ import { useAppStore } from '@/lib/store'
 export function CameraRig() {
   const scroll = useScroll()
   const { camera } = useThree()
+  const isTransitioning = useAppStore((s) => s.isTransitioning)
   const setScrollProgress = useAppStore((s) => s.setScrollProgress)
 
   useFrame(() => {
+    if (isTransitioning) return
     const offset = scroll.offset
 
     const pos = getCameraPosition(offset)

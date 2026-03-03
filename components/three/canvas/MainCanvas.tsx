@@ -7,6 +7,8 @@ import { LoadingScreen } from './LoadingScreen'
 import { Timeline } from '@/components/three/world/Timeline'
 import { EventRoom } from '@/components/three/rooms/EventRoom'
 import { useAppStore } from '@/lib/store'
+import { CameraTransition } from './CameraTransition'
+import { Effects } from './Effects'
 
 function Scene() {
   const navigation = useAppStore((s) => s.navigation)
@@ -30,6 +32,8 @@ export function MainCanvas() {
             gl={{ antialias: true }}
           >
             <Scene />
+            <CameraTransition />
+            <Effects />
           </Canvas>
         </Suspense>
       </div>
