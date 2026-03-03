@@ -28,6 +28,7 @@ function EventMarker({
   category: string
 }) {
   const meshRef = useRef<THREE.Mesh>(null)
+  const ringRef = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
   const enterRoom = useAppStore((s) => s.enterRoom)
 
@@ -38,18 +39,56 @@ function EventMarker({
 
   useFrame(({ clock }) => {
     if (!meshRef.current) return
-    meshRef.current.position.y = 1.5 + Math.sin(clock.elapsedTime * 2) * 0.1
-    meshRef.current.scale.setScalar(hovered ? 1.3 : 1)
+    const t = clock.elapsedTime
+
+    meshRef.current.position.y = 1.5 + Math.sin(t * 2) * 0.1
+    meshRef.current.rotation.y = t * 0.5
+
+    const targetScale = hovered ? 1.3 : 1
+    const currentScale = meshRef.current.scale.x
+    meshRef.current.scale.setScalar(
+      THREE.MathUtils.lerp(currentScale, targetScale, 0.1)
+    )
+
+    if (ringRef.current) {
+      const pulse = 1 + Math.sin(t * 3) * 0.2
+      ringRef.current.scale.setScalar(pulse)
+      ;(ringRef.current.material as THREE.MeshBasicMaterial).opacity =
+        0.15 + Math.sin(t * 3) * 0.1
+    }
   })
 
   return (
     <group position={[pathPos.x, 0, pathPos.z]}>
+      {/* Pulse ring on ground */}
+      <mesh
+        ref={ringRef}
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, 0.05, 0]}
+      >
+        <ringGeometry args={[0.6, 0.8, 32]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.2}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Marker dodecahedron */}
       <mesh
         ref={meshRef}
         position={[0, 1.5, 0]}
         onClick={() => enterRoom(eventId)}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        onPointerOver={(e) => {
+          e.stopPropagation()
+          setHovered(true)
+          document.body.style.cursor = 'pointer'
+        }}
+        onPointerOut={() => {
+          setHovered(false)
+          document.body.style.cursor = 'auto'
+        }}
       >
         <dodecahedronGeometry args={[0.4, 0]} />
         <meshStandardMaterial
@@ -60,6 +99,7 @@ function EventMarker({
         />
       </mesh>
 
+      {/* Title label */}
       <Text
         position={[0, 0.6, 0]}
         fontSize={0.25}
@@ -70,6 +110,19 @@ function EventMarker({
       >
         {title}
       </Text>
+
+      {/* Category badge — visible on hover */}
+      {hovered && (
+        <Text
+          position={[0, 2.5, 0]}
+          fontSize={0.18}
+          color={color}
+          anchorX="center"
+          anchorY="bottom"
+        >
+          {category.toUpperCase()}
+        </Text>
+      )}
     </group>
   )
 }
