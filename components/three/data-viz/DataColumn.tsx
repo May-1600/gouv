@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 import type { DataPoint } from '@/types/room'
@@ -11,6 +12,7 @@ interface DataColumnProps {
   color: string
   position: [number, number, number]
   maxHeight?: number
+  delay?: number
 }
 
 export function DataColumn({
@@ -19,24 +21,36 @@ export function DataColumn({
   color,
   position,
   maxHeight = 4,
+  delay = 0,
 }: DataColumnProps) {
   const meshRef = useRef<THREE.Mesh>(null)
+  const [animatedHeight, setAnimatedHeight] = useState(0.01)
+  const elapsedRef = useRef(0)
 
-  const normalizedHeight = maxValue > 0
-    ? (point.value / maxValue) * maxHeight
-    : 0.1
+  const targetHeight = Math.max(
+    0.1,
+    maxValue > 0 ? (point.value / maxValue) * maxHeight : 0.1
+  )
 
-  const height = Math.max(0.1, normalizedHeight)
+  useFrame((_, delta) => {
+    elapsedRef.current += delta
+
+    if (elapsedRef.current < delay) return
+
+    const newHeight = THREE.MathUtils.lerp(animatedHeight, targetHeight, Math.min(1, delta * 4))
+    if (Math.abs(newHeight - animatedHeight) > 0.001) {
+      setAnimatedHeight(newHeight)
+    }
+  })
 
   return (
     <group position={position}>
-      {/* Column */}
       <mesh
         ref={meshRef}
-        position={[0, height / 2, 0]}
+        position={[0, animatedHeight / 2, 0]}
         castShadow
       >
-        <boxGeometry args={[0.4, height, 0.4]} />
+        <boxGeometry args={[0.4, animatedHeight, 0.4]} />
         <meshStandardMaterial
           color={color}
           roughness={0.7}
@@ -44,9 +58,8 @@ export function DataColumn({
         />
       </mesh>
 
-      {/* Value label on top */}
       <Text
-        position={[0, height + 0.3, 0]}
+        position={[0, animatedHeight + 0.3, 0]}
         fontSize={0.2}
         color="#1a1a2e"
         anchorX="center"
@@ -55,7 +68,6 @@ export function DataColumn({
         {point.value.toFixed(1)}
       </Text>
 
-      {/* Date label at bottom */}
       <Text
         position={[0, -0.2, 0]}
         fontSize={0.15}
@@ -70,10 +82,6 @@ export function DataColumn({
   )
 }
 
-/**
- * A row of DataColumns for a single indicator.
- * Shows data points around the event date (+-4 points).
- */
 interface DataColumnRowProps {
   data: DataPoint[]
   eventDate: string
@@ -98,10 +106,13 @@ export function DataColumnRow({ data, eventDate, color, position }: DataColumnRo
           key={point.date}
           point={point}
           maxValue={maxValue}
-          color={point.date === eventDate || point.date.startsWith(eventDate.slice(0, 7))
-            ? '#ef4444'
-            : color}
+          color={
+            point.date === eventDate || point.date.startsWith(eventDate.slice(0, 7))
+              ? '#ef4444'
+              : color
+          }
           position={[(i - slice.length / 2) * 0.7, 0, 0]}
+          delay={i * 0.08}
         />
       ))}
     </group>
