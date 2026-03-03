@@ -10,6 +10,10 @@ interface AppState {
   currentYear: number
   activeEventId: string | null
 
+  // Camera transition
+  isTransitioning: boolean
+  transitionProgress: number
+
   // Data
   indicators: Map<string, Indicator[]>
   events: Event[]
@@ -19,6 +23,9 @@ interface AppState {
   setScrollProgress: (progress: number) => void
   enterRoom: (eventId: string) => void
   exitRoom: () => void
+  setTransitionProgress: (progress: number) => void
+  startTransition: () => void
+  endTransition: () => void
   setIndicators: (name: string, data: Indicator[]) => void
   setEvents: (events: Event[]) => void
   setLoading: (loading: boolean) => void
@@ -32,6 +39,8 @@ export const useAppStore = create<AppState>((set) => ({
   scrollProgress: 0,
   currentYear: START_YEAR,
   activeEventId: null,
+  isTransitioning: false,
+  transitionProgress: 0,
   indicators: new Map(),
   events: [],
   isLoading: true,
@@ -43,10 +52,19 @@ export const useAppStore = create<AppState>((set) => ({
     }),
 
   enterRoom: (eventId) =>
-    set({ navigation: 'room', activeEventId: eventId }),
+    set({ navigation: 'room', activeEventId: eventId, isTransitioning: true, transitionProgress: 0 }),
 
   exitRoom: () =>
-    set({ navigation: 'timeline', activeEventId: null }),
+    set({ navigation: 'timeline', activeEventId: null, isTransitioning: true, transitionProgress: 0 }),
+
+  setTransitionProgress: (progress) =>
+    set({ transitionProgress: progress }),
+
+  startTransition: () =>
+    set({ isTransitioning: true, transitionProgress: 0 }),
+
+  endTransition: () =>
+    set({ isTransitioning: false, transitionProgress: 1 }),
 
   setIndicators: (name, data) =>
     set((state) => {
