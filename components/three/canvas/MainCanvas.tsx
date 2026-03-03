@@ -12,7 +12,7 @@ export function MainCanvas() {
       <div className="fixed inset-0">
         <Suspense fallback={<LoadingScreen />}>
           <Canvas
-            camera={{ fov: 60, near: 0.1, far: 200, position: [0, 3, 0] }}
+            camera={{ fov: 50, near: 0.1, far: 300, position: [-6, 10, 8] }}
             shadows
             dpr={[1, 2]}
             gl={{ antialias: true }}

@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
-import { yearToPathX } from '@/lib/three/camera-path'
+import { yearToPathPosition } from '@/lib/three/camera-path'
 import { useAppStore } from '@/lib/store'
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -33,7 +33,7 @@ function EventMarker({
 
   const year = new Date(date).getFullYear()
   const monthFraction = new Date(date).getMonth() / 12
-  const x = yearToPathX(year + monthFraction)
+  const pathPos = yearToPathPosition(year + monthFraction)
   const color = CATEGORY_COLORS[category] || '#a78bfa'
 
   useFrame(({ clock }) => {
@@ -43,7 +43,7 @@ function EventMarker({
   })
 
   return (
-    <group position={[x, 0, 0]}>
+    <group position={[pathPos.x, 0, pathPos.z]}>
       <mesh
         ref={meshRef}
         position={[0, 1.5, 0]}

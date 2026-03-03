@@ -3,19 +3,16 @@ import {
   getCameraPosition,
   getLookAtTarget,
   getPathPoints,
+  getGroundPosition,
+  yearToPathPosition,
   PATH_LENGTH,
   CAMERA_HEIGHT,
+  CAMERA_OFFSET,
 } from '../camera-path'
 
 describe('PATH_LENGTH', () => {
   it('is 100 units', () => {
     expect(PATH_LENGTH).toBe(100)
-  })
-})
-
-describe('CAMERA_HEIGHT', () => {
-  it('is 3 units', () => {
-    expect(CAMERA_HEIGHT).toBe(3)
   })
 })
 
@@ -35,45 +32,87 @@ describe('getPathPoints', () => {
   })
 })
 
-describe('getCameraPosition', () => {
-  it('returns position at start when offset=0', () => {
-    const pos = getCameraPosition(0)
+describe('getGroundPosition', () => {
+  it('returns ground-level position at offset=0', () => {
+    const pos = getGroundPosition(0)
     expect(pos.x).toBeCloseTo(0, 0)
-    expect(pos.y).toBeCloseTo(CAMERA_HEIGHT, 0)
+    expect(pos.y).toBeCloseTo(0, 0)
   })
 
-  it('returns position at end when offset=1', () => {
-    const pos = getCameraPosition(1)
-    expect(pos.x).toBeCloseTo(PATH_LENGTH, 0)
-    expect(pos.y).toBeCloseTo(CAMERA_HEIGHT, 0)
-  })
-
-  it('returns intermediate position at offset=0.5', () => {
-    const pos = getCameraPosition(0.5)
-    expect(pos.x).toBeGreaterThan(0)
-    expect(pos.x).toBeLessThan(PATH_LENGTH)
-  })
-
-  it('clamps offset below 0', () => {
-    const pos = getCameraPosition(-0.5)
-    expect(pos.x).toBeCloseTo(0, 0)
-  })
-
-  it('clamps offset above 1', () => {
-    const pos = getCameraPosition(1.5)
+  it('returns ground-level position at offset=1', () => {
+    const pos = getGroundPosition(1)
     expect(pos.x).toBeCloseTo(PATH_LENGTH, 0)
   })
 })
 
-describe('getLookAtTarget', () => {
-  it('is always ahead of camera position', () => {
-    const pos = getCameraPosition(0.3)
-    const target = getLookAtTarget(0.3)
-    expect(target.x).toBeGreaterThan(pos.x)
+describe('getCameraPosition', () => {
+  it('is offset from ground path by CAMERA_OFFSET', () => {
+    const ground = getGroundPosition(0)
+    const cam = getCameraPosition(0)
+    expect(cam.x).toBeCloseTo(ground.x + CAMERA_OFFSET.x, 0)
+    expect(cam.y).toBeCloseTo(ground.y + CAMERA_OFFSET.y, 0)
+    expect(cam.z).toBeCloseTo(ground.z + CAMERA_OFFSET.z, 0)
   })
 
-  it('at end, looks slightly forward', () => {
+  it('is elevated above the ground path', () => {
+    const cam = getCameraPosition(0.5)
+    const ground = getGroundPosition(0.5)
+    expect(cam.y).toBeGreaterThan(ground.y + 5)
+  })
+
+  it('advances along x as offset increases', () => {
+    const start = getCameraPosition(0)
+    const mid = getCameraPosition(0.5)
+    const end = getCameraPosition(1)
+    expect(mid.x).toBeGreaterThan(start.x)
+    expect(end.x).toBeGreaterThan(mid.x)
+  })
+
+  it('clamps offset below 0', () => {
+    const pos = getCameraPosition(-0.5)
+    const start = getCameraPosition(0)
+    expect(pos.x).toBeCloseTo(start.x, 1)
+  })
+
+  it('clamps offset above 1', () => {
+    const pos = getCameraPosition(1.5)
+    const end = getCameraPosition(1)
+    expect(pos.x).toBeCloseTo(end.x, 1)
+  })
+})
+
+describe('getLookAtTarget', () => {
+  it('is ahead of the ground position on x', () => {
+    const ground = getGroundPosition(0.3)
+    const target = getLookAtTarget(0.3)
+    expect(target.x).toBeGreaterThan(ground.x)
+  })
+
+  it('at end, looks slightly forward past PATH_LENGTH', () => {
     const target = getLookAtTarget(1)
     expect(target.x).toBeGreaterThanOrEqual(PATH_LENGTH)
+  })
+
+  it('is at ground level (not elevated)', () => {
+    const target = getLookAtTarget(0.5)
+    expect(Math.abs(target.y)).toBeLessThan(2)
+  })
+})
+
+describe('yearToPathPosition', () => {
+  it('returns position near x=0 for 2017', () => {
+    const pos = yearToPathPosition(2017)
+    expect(pos.x).toBeCloseTo(0, 0)
+  })
+
+  it('returns position near x=PATH_LENGTH for 2026', () => {
+    const pos = yearToPathPosition(2026)
+    expect(pos.x).toBeCloseTo(PATH_LENGTH, 0)
+  })
+
+  it('returns intermediate position for 2021', () => {
+    const pos = yearToPathPosition(2021)
+    expect(pos.x).toBeGreaterThan(10)
+    expect(pos.x).toBeLessThan(80)
   })
 })
