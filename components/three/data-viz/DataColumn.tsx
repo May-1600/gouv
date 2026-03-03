@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 import type { DataPoint } from '@/types/room'
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion'
 
 interface DataColumnProps {
   point: DataPoint
@@ -26,6 +27,7 @@ export function DataColumn({
   const meshRef = useRef<THREE.Mesh>(null)
   const [animatedHeight, setAnimatedHeight] = useState(0.01)
   const elapsedRef = useRef(0)
+  const reducedMotion = useReducedMotion()
 
   const targetHeight = Math.max(
     0.1,
@@ -33,6 +35,11 @@ export function DataColumn({
   )
 
   useFrame((_, delta) => {
+    if (reducedMotion) {
+      if (animatedHeight !== targetHeight) setAnimatedHeight(targetHeight)
+      return
+    }
+
     elapsedRef.current += delta
 
     if (elapsedRef.current < delay) return

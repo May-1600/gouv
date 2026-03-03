@@ -5,6 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useAppStore } from '@/lib/store'
 import { getCameraPosition, getLookAtTarget } from '@/lib/three/camera-path'
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion'
 
 const ROOM_CAMERA_POS = new THREE.Vector3(0, 5, 10)
 const ROOM_LOOK_AT = new THREE.Vector3(0, 2, -1)
@@ -12,6 +13,7 @@ const TRANSITION_SPEED = 2.5
 
 export function CameraTransition() {
   const { camera } = useThree()
+  const reducedMotion = useReducedMotion()
   const isTransitioning = useAppStore((s) => s.isTransitioning)
   const navigation = useAppStore((s) => s.navigation)
   const scrollProgress = useAppStore((s) => s.scrollProgress)
@@ -49,7 +51,11 @@ export function CameraTransition() {
       }
     }
 
-    progressRef.current = Math.min(1, progressRef.current + delta * TRANSITION_SPEED)
+    if (reducedMotion) {
+      progressRef.current = 1
+    } else {
+      progressRef.current = Math.min(1, progressRef.current + delta * TRANSITION_SPEED)
+    }
     const t = easeInOutCubic(progressRef.current)
 
     camera.position.lerpVectors(fromPos.current, toPos.current, t)

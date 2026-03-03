@@ -6,6 +6,7 @@ import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { yearToPathPosition } from '@/lib/three/camera-path'
 import { useAppStore } from '@/lib/store'
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion'
 
 const CATEGORY_COLORS: Record<string, string> = {
   fiscalite: '#f59e0b',
@@ -31,6 +32,7 @@ function EventMarker({
   const ringRef = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
   const enterRoom = useAppStore((s) => s.enterRoom)
+  const reducedMotion = useReducedMotion()
 
   const year = new Date(date).getFullYear()
   const monthFraction = new Date(date).getMonth() / 12
@@ -41,8 +43,10 @@ function EventMarker({
     if (!meshRef.current) return
     const t = clock.elapsedTime
 
-    meshRef.current.position.y = 1.5 + Math.sin(t * 2) * 0.1
-    meshRef.current.rotation.y = t * 0.5
+    if (!reducedMotion) {
+      meshRef.current.position.y = 1.5 + Math.sin(t * 2) * 0.1
+      meshRef.current.rotation.y = t * 0.5
+    }
 
     const targetScale = hovered ? 1.3 : 1
     const currentScale = meshRef.current.scale.x
@@ -50,7 +54,7 @@ function EventMarker({
       THREE.MathUtils.lerp(currentScale, targetScale, 0.1)
     )
 
-    if (ringRef.current) {
+    if (ringRef.current && !reducedMotion) {
       const pulse = 1 + Math.sin(t * 3) * 0.2
       ringRef.current.scale.setScalar(pulse)
       ;(ringRef.current.material as THREE.MeshBasicMaterial).opacity =

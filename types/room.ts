@@ -14,6 +14,15 @@ export interface RoomIndicator {
   data: DataPoint[]
 }
 
+/** Narrative analysis for an indicator around an event */
+export interface RoomNarrative {
+  indicatorName: string
+  before: string | null
+  analysis: string | null
+  comparison: string | null
+  projection: string | null
+}
+
 /** Full room data payload */
 export interface RoomData {
   event: {
@@ -25,4 +34,5 @@ export interface RoomData {
     sources: string[] | null
   }
   indicators: RoomIndicator[]
+  narratives: RoomNarrative[]
 }

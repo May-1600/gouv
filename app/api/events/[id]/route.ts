@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getEventWithIndicators, getIndicatorSeries } from '@/lib/queries'
+import { getEventWithIndicators, getIndicatorSeries, getNarrative } from '@/lib/queries'
 import { getIndicatorConfig } from '@/data/indicator-config'
 
 export async function GET(
@@ -34,9 +34,32 @@ export async function GET(
       })
     )
 
+    // Fetch narratives for each indicator (may not exist for all)
+    const eventYear = new Date(event.date).getFullYear()
+    const narratives = (
+      await Promise.all(
+        eventIndicators.map(async (ei) => {
+          const narrative = await getNarrative(
+            ei.indicator_name,
+            `${eventYear - 1}-01-01`,
+            `${eventYear + 1}-12-31`
+          )
+          if (!narrative) return null
+          return {
+            indicatorName: ei.indicator_name,
+            before: narrative.before,
+            analysis: narrative.analysis,
+            comparison: narrative.comparison,
+            projection: narrative.projection,
+          }
+        })
+      )
+    ).filter((n): n is NonNullable<typeof n> => n !== null)
+
     return NextResponse.json({
       event,
       indicators: indicatorSeries,
+      narratives,
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
