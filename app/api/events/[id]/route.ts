@@ -47,10 +47,10 @@ export async function GET(
           if (!narrative) return null
           return {
             indicatorName: ei.indicator_name,
-            before: narrative.before,
-            analysis: narrative.analysis,
-            comparison: narrative.comparison,
-            projection: narrative.projection,
+            before: narrative.content_before,
+            analysis: narrative.content_analysis,
+            comparison: narrative.content_comparison,
+            projection: narrative.content_projection,
           }
         })
       )
